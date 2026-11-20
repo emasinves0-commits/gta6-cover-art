@@ -1,5 +1,6 @@
 // Colour grades written from canvas filters, blended gradient overlays, bloom and a vignette. `strength` (0..1)
-// scales every part of a grade, so 0 is the untouched photo and 1 the full look.
+// scales every part of a grade, so 0 is the untouched photo and 1 the full look. Six looks: none, Vice Sunset, Neon
+// Nights, Palm Noir, Golden Hour and Teal Chrome. "none" has no `filter`, which applyGrade treats as "leave alone".
 const NEUTRAL = { saturate: 1, contrast: 1, brightness: 1, sepia: 0, grayscale: 0, 'hue-rotate': 0 };
 
 export const GRADES = [
@@ -53,6 +54,19 @@ export const GRADES = [
     bloom: 0.35,
     vignette: 0.35,
   },
+  {
+    id: 'chrome',
+    label: 'Teal Chrome',
+    swatch: 'linear-gradient(180deg,#8ef5ee,#2a7fb8 60%,#0d1f3d)',
+    filter: { saturate: 1.05, contrast: 1.25, brightness: 0.98, 'hue-rotate': -25 },
+    overlays: [
+      { angle: 180, stops: [[0, '#6ff0ec'], [0.5, '#2f86d0'], [1, '#14224a']], mode: 'soft-light', alpha: 1 },
+      { angle: 180, stops: [[0, '#19d3d6'], [1, '#1f4fa8']], mode: 'overlay', alpha: 0.55 },
+      { angle: 180, stops: [[0, 'rgba(20,200,220,0)'], [1, '#0a1230']], mode: 'multiply', alpha: 0.45 },
+    ],
+    bloom: 0.25,
+    vignette: 0.6,
+  },
 ];
 
 export function gradeById(id) {
@@ -64,7 +78,8 @@ function filterText(filter, strength) {
     .map(([name, target]) => {
       const from = NEUTRAL[name];
       const unit = name === 'hue-rotate' ? 'deg' : '';
-      return `${name}(${from + (target - from) * strength}${unit})`;
+      const value = Math.round((from + (target - from) * strength) * 1000) / 1000; // no 1.0499999999999998 in the filter string
+      return `${name}(${value}${unit})`;
     })
     .join(' ');
 }

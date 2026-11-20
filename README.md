@@ -16,14 +16,17 @@ original design; the only bundled font is Anton (SIL Open Font License, `app/fon
 - **Per-panel framing**: drag the photo in the preview, zoom slider, and three crops (Fill centre, Fill top, Fit whole
   photo). Moving the zoom clamps the offset back inside the new bounds, and changing the crop resets zoom to 1.
 - **Numbered chips**: one small live canvas per panel showing its current fit, zoom and offset.
-- **Colour grades** written on canvas (filters, blended gradients, bloom, vignette): Vice Sunset, Neon Nights, Palm Noir,
-  Golden Hour and No grade, with a strength slider.
+- **Six colour grades** written on canvas (filters, blended gradients, bloom, vignette): Vice Sunset, Neon Nights, Palm
+  Noir, Golden Hour, Teal Chrome (a cool teal and steel-blue look) and No grade, with a strength slider.
+- **Reset look** restores the default layout, size, grade, caption and panel framing but keeps your loaded photos.
+- **Keyboard** (outside text fields): `1`-`4` pick a panel, arrows nudge the photo, `R` resets its position, `E` exports.
+- **Safe uploads**: files over 40 MB, empty files and undecodable images are skipped with a message; the rest still load.
 - **Poster lettering**: caption and tagline with size and colour controls, dark outline, coloured extrusion, drop shadow.
 - **One-click export** at 1080x1080, 1080x1350 and 1920x1080. Preview and export use the same renderer.
 
 ## Run it
 
-    node serve.ts            # http://localhost:8080
+    node serve.ts            # http://localhost:8080 (pick another port with: node serve.ts --port 8123)
     mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts   # the hand-in: app/, screenshots/, dossier.json
 
 Screenshot scenes (no interaction needed): `?shot=editor&photo=boulevard&caption=Boulevard%20Queen`,

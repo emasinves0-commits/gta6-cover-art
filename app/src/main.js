@@ -1,6 +1,6 @@
 // The editor UI: builds the pickers, wires every control to the shared state, repaints the live preview and the
 // panel chips, handles drag-to-reposition and photo drops, and runs the export.
-import { state, subscribe, notify, EXPORT_SIZES, sizeById } from './cover-state.js';
+import { state, subscribe, notify, resetLook, EXPORT_SIZES, sizeById } from './cover-state.js';
 import { LAYOUTS, layoutById, panelRects } from './panel-layouts.js';
 import { FIT_MODES, clampPanelOffset } from './photo-placement.js';
 import { GRADES } from './color-grades.js';
@@ -51,6 +51,7 @@ function buildLayoutPicker() {
       notify();
     });
     b.title = `${layout.label} (${layout.count} panels)`;
+    b.dataset.layout = layout.id;
     const mini = document.createElement('div');
     mini.className = 'mini';
     for (const r of layout.build(400, 300)) {
@@ -158,7 +159,7 @@ function syncControls() {
   $('strengthOut').textContent = `${Math.round(state.gradeStrength * 100)}%`;
   $('captionSize').value = String(state.captionSize);
   $('captionSizeOut').textContent = `${Math.round(state.captionSize * 100)}%`;
-  for (const b of $('layoutPicker').children) b.setAttribute('aria-pressed', String(b.title.startsWith(layoutById(state.layoutId).label)));
+  for (const b of $('layoutPicker').children) b.setAttribute('aria-pressed', String(b.dataset.layout === state.layoutId));
   for (const b of $('fitPicker').children) b.setAttribute('aria-pressed', String(b.dataset.fit === panel.fit));
   for (const b of $('sizePicker').children) b.setAttribute('aria-pressed', String(b.dataset.size === state.sizeId));
   for (const b of $('gradePicker').children) b.setAttribute('aria-pressed', String(b.dataset.grade === state.gradeId));
@@ -174,13 +175,24 @@ async function assignPhotos(fileList, start = state.selected) {
   const files = onlyImageFiles(fileList);
   if (!files.length) { $('status').textContent = 'Those files are not images.'; return; }
   const count = panelCount();
-  for (let k = 0; k < Math.min(files.length, count); k++) {
-    const img = await loadImageFromFile(files[k]);
-    Object.assign(state.panels[(start + k) % count], { img, name: files[k].name, fit: 'fill-top', zoom: 1, ox: 0, oy: 0 });
+  const failures = [];
+  let loaded = 0;
+  $('status').textContent = 'Loading…';
+  // A file that cannot be decoded is skipped without using up a panel slot, so one bad file never blocks the rest.
+  for (const file of files) {
+    if (loaded >= count) break;
+    try {
+      const img = await loadImageFromFile(file);
+      Object.assign(state.panels[(start + loaded) % count], { img, name: file.name, fit: 'fill-top', zoom: 1, ox: 0, oy: 0 });
+      loaded++;
+    } catch (err) {
+      failures.push(err.message);
+    }
   }
   state.selected = start;
   clampAllPanels();
-  $('status').textContent = `Loaded ${Math.min(files.length, count)} photo(s).`;
+  const skipped = failures.length ? ` Skipped ${failures.length}: ${failures[0]}.` : '';
+  $('status').textContent = loaded ? `Loaded ${loaded} photo(s).${skipped}` : `No photo loaded.${skipped}`;
   notify();
 }
 
@@ -199,10 +211,12 @@ $('fillAll').addEventListener('click', () => {
   notify();
 });
 
-$('resetPlacement').addEventListener('click', () => {
+/** Puts the selected panel's photo back to zoom 1, centred (used by the button and the R key). */
+function resetSelectedPlacement() {
   Object.assign(state.panels[state.selected], { zoom: 1, ox: 0, oy: 0 });
   notify();
-});
+}
+$('resetPlacement').addEventListener('click', resetSelectedPlacement);
 
 $('zoom').addEventListener('input', (e) => {
   const panel = state.panels[state.selected];
@@ -265,10 +279,55 @@ dropZone.addEventListener('drop', (e) => {
 });
 
 // ---- export --------------------------------------------------------------------------------------------------
-$('exportBtn').addEventListener('click', async () => {
-  const result = await exportCover(state, state.sizeId);
-  window.__lastExport = { name: result.name, width: result.width, height: result.height, bytes: result.blob.size };
-  $('status').textContent = `Saved ${result.name} (${result.width} × ${result.height})`;
+let exporting = false;
+async function runExport() {
+  if (exporting) return;
+  exporting = true;
+  $('exportBtn').disabled = true;
+  try {
+    const result = await exportCover(state, state.sizeId);
+    window.__lastExport = { name: result.name, width: result.width, height: result.height, bytes: result.blob.size };
+    $('status').textContent = `Saved ${result.name} (${result.width} × ${result.height})`;
+  } catch (err) {
+    $('status').textContent = `Export failed: ${err.message}`;
+  } finally {
+    exporting = false;
+    $('exportBtn').disabled = false;
+  }
+}
+$('exportBtn').addEventListener('click', runExport);
+
+// ---- reset and keyboard shortcuts ----------------------------------------------------------------------------
+$('resetAll').addEventListener('click', () => {
+  resetLook();
+  buildChips();
+  clampAllPanels();
+  $('status').textContent = 'Look reset to the defaults; photos kept.';
+  notify();
+});
+
+const NUDGE = 0.01; // fraction of the panel size per arrow press
+const ARROWS = { ArrowLeft: [-NUDGE, 0], ArrowRight: [NUDGE, 0], ArrowUp: [0, -NUDGE], ArrowDown: [0, NUDGE] };
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest?.('input, textarea, select')) return; // never steal keys from text fields and sliders
+  const key = e.key;
+  if (/^[1-4]$/.test(key) && Number(key) <= panelCount()) {
+    state.selected = Number(key) - 1;
+    notify();
+  } else if (key === 'e' || key === 'E') {
+    runExport();
+  } else if (key === 'r' || key === 'R') {
+    resetSelectedPlacement();
+  } else if (ARROWS[key]) {
+    const panel = state.panels[state.selected];
+    panel.ox += ARROWS[key][0];
+    panel.oy += ARROWS[key][1];
+    const { w, h } = sizeById(state.sizeId);
+    clampPanelOffset(panel, rectOfPanel(state.selected, w, h));
+    e.preventDefault();
+    notify();
+  }
 });
 
 // ---- start ---------------------------------------------------------------------------------------------------

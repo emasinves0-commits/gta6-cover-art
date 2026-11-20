@@ -8,9 +8,12 @@ export async function renderToBlob(st, sizeId) {
   const canvas = document.createElement('canvas');
   renderCover(canvas, size.w, size.h, st);
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  // toBlob yields null when the browser cannot allocate or encode a canvas this big (low-memory phones).
+  if (!blob) throw new Error(`the browser could not encode a ${size.w} × ${size.h} PNG`);
   return { blob, width: canvas.width, height: canvas.height, name: `cover-${size.id}.png` };
 }
 
+/** Renders and downloads the PNG; resolves with the render result and rejects if the render or encode failed. */
 export async function exportCover(st, sizeId) {
   const result = await renderToBlob(st, sizeId);
   const link = document.createElement('a');

@@ -11,7 +11,8 @@ export function createPanel() {
   return { img: null, name: '', fit: 'fill-centre', zoom: 1, ox: 0, oy: 0 };
 }
 
-export const state = {
+/** Everything except the photos: what "Reset look" restores. */
+export const DEFAULT_LOOK = {
   sizeId: '1920x1080',
   layoutId: 'hero-side',
   gradeId: 'vice',
@@ -22,9 +23,19 @@ export const state = {
   captionColor: '#ffe45c',
   extrusionColor: '#ff2d7a',
   captionPosition: 'bottom',
+};
+
+export const state = {
+  ...DEFAULT_LOOK,
   selected: 0,
   panels: Array.from({ length: MAX_PANELS }, createPanel),
 };
+
+/** Restores the default look and every panel's placement, but keeps the loaded photos. */
+export function resetLook() {
+  Object.assign(state, DEFAULT_LOOK, { selected: 0 });
+  for (const panel of state.panels) Object.assign(panel, { fit: 'fill-centre', zoom: 1, ox: 0, oy: 0 });
+}
 
 const listeners = new Set();
 
@@ -34,6 +45,7 @@ export function subscribe(fn) {
   return () => listeners.delete(fn);
 }
 
+/** Tells every subscriber that the state changed (callers mutate `state` directly, then call this). */
 export function notify() {
   for (const fn of listeners) fn(state);
 }

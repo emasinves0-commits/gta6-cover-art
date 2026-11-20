@@ -25,6 +25,7 @@
         <button id="fillAll" type="button">Use for all panels</button>
       </div>
       <p class="hint">Drop photos on the preview or a chip. Several files fill several panels. Drag the photo in the preview to reposition it.</p>
+      <p class="hint">Keys (outside text fields): <kbd>1</kbd>&ndash;<kbd>4</kbd> pick a panel, arrows nudge the photo, <kbd>R</kbd> resets its position, <kbd>E</kbd> exports. Photos up to 40&nbsp;MB.</p>
       <div class="field"><span>Crop</span><div id="fitPicker" class="seg"></div></div>
       <div class="field"><span>Zoom <output id="zoomOut">1.00x</output></span>
         <input id="zoom" type="range" min="1" max="3" step="0.01" value="1"></div>
@@ -36,11 +37,12 @@
     </section>
   </aside>
   <section class="stage">
-    <div id="dropZone" class="preview-wrap"><canvas id="cover" aria-label="Live cover preview"></canvas></div>
+    <div id="dropZone" class="preview-wrap"><canvas id="cover" role="img" aria-label="Live cover preview. Drag to reposition the selected panel's photo."></canvas></div>
     <div id="chipStrip" class="chips" aria-label="Panels"></div>
     <div class="exportbar">
-      <button id="exportBtn" class="button primary big" type="button">Export PNG</button>
-      <span id="status" role="status"></span>
+      <button id="exportBtn" class="button primary big" type="button" aria-keyshortcuts="E" title="Export PNG (E)">Export PNG</button>
+      <button id="resetAll" type="button" title="Back to the default look; your photos stay loaded">Reset look</button>
+      <span id="status" role="status" aria-live="polite"></span>
     </div>
   </section>
   <aside class="column" id="rightColumn">

@@ -2,12 +2,21 @@
 // the output directory, then writes dossier.json with the vendored make.fun library.
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-app.ts';
 
 const sourceRoot = fileURLToPath(new URL('.', import.meta.url));
 const outputRoot = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+
+// Copying app/ into itself (or over the sources) would corrupt the repo, so refuse those output directories.
+const resolvedOutput = resolve(outputRoot);
+if (resolvedOutput === resolve(sourceRoot) || resolvedOutput === resolve(sourceRoot, 'app')) {
+  throw new Error(`MAKEFUN_OUTPUT_DIR must not be the source directory itself: ${resolvedOutput}`);
+}
+
+// Fail early with a clear message instead of a raw ENOENT from cpSync if app/ is missing.
+if (!existsSync(join(sourceRoot, 'app', 'index.html'))) throw new Error(`app/index.html not found beside ${sourceRoot}`);
 
 mkdirSync(outputRoot, { recursive: true });
 cpSync(join(sourceRoot, 'app'), join(outputRoot, 'app'), { recursive: true });
@@ -25,3 +34,4 @@ const caps = {
   app_path_max_bytes: 1000,
 };
 writeFileSync(join(outputRoot, 'dossier.json'), buildDossier(outputRoot, caps));
+console.log(`hand-in written to ${resolvedOutput} (dossier.json, app/, screenshots/)`);

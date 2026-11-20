@@ -2,6 +2,8 @@
 // light-to-dark fill gradient, plus a small letter-spaced tagline and a scrim that keeps the words readable.
 export const LETTERING_FONT = 'Anton, Impact, "Arial Black", sans-serif';
 const OUTLINE_INK = '#16081f';
+/** fitCaption stops shrinking below this many pixels, so a very long caption stays legible instead of vanishing. */
+const MIN_CAPTION_PX = 14;
 
 function parseHex(hex) {
   const v = /^#?([0-9a-f]{6})$/i.exec(hex)?.[1] ?? 'ffffff';
@@ -39,7 +41,7 @@ function fitCaption(ctx, text, startPx, maxWidth) {
     ctx.font = `${px}px ${LETTERING_FONT}`;
     const lines = wrapWords(ctx, text, maxWidth);
     const widest = Math.max(0, ...lines.map((l) => ctx.measureText(l).width));
-    if ((lines.length <= 3 && widest <= maxWidth) || px < 14) return { px, lines };
+    if ((lines.length <= 3 && widest <= maxWidth) || px < MIN_CAPTION_PX) return { px, lines };
     px *= 0.93;
   }
   return { px, lines: [text] };
@@ -151,7 +153,7 @@ export function drawLettering(ctx, w, h, opts) {
   if (!caption && !tagline) return;
   const maxWidth = w * 0.86;
   const { px, lines } = caption ? fitCaption(ctx, caption, Math.min(w, h) * 0.19 * opts.size, maxWidth) : { px: 0, lines: [] };
-  ctx.font = `${px || 40}px ${LETTERING_FONT}`;
+  ctx.font = `${px || 40}px ${LETTERING_FONT}`; // tagline-only cover: px is 0, so measure with any sane size
   const capHeight = px ? ctx.measureText('H').actualBoundingBoxAscent : 0;
   const step = capHeight * 1.2;
   const tagPx = Math.max(Math.min(w, h) * 0.026, px * 0.17);

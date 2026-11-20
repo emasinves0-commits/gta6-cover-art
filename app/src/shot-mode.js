@@ -1,11 +1,14 @@
 // Deterministic scenes for screenshots. `?shot=editor` shows the full editor and `?shot=cover` only the cover; the
 // other params pick the content: photo (hero sample), caption, tagline, layout, grade, size. Nothing is random and no
 // interaction is needed. window.__shotReady is set once the first full paint is done.
-import { state } from './cover-state.js';
+import { state, sizeById, EXPORT_SIZES } from './cover-state.js';
 import { loadImageFromUrl } from './photo-loading.js';
 import { clampPanelOffset, placePhoto } from './photo-placement.js';
-import { panelRects } from './panel-layouts.js';
-import { sizeById } from './cover-state.js';
+import { LAYOUTS, panelRects } from './panel-layouts.js';
+import { GRADES } from './color-grades.js';
+
+/** Returns the query value only if it is one of the known ids, so a typo in a shot URL keeps the default. */
+const known = (query, key, list) => (list.some((item) => item.id === query.get(key)) ? query.get(key) : null);
 
 // Per-panel placements tuned so every face stays whole: top-anchored fills for the face panels, and face-free detail
 // panels (a `focus` point in photo coordinates, centred in the panel) wherever the caption lands on top of a panel.
@@ -49,10 +52,10 @@ export async function runShot(query, requestPaint) {
 
   state.caption = query.get('caption') ?? 'Sunset Heist';
   if (query.has('tagline')) state.tagline = query.get('tagline');
-  if (query.has('layout')) state.layoutId = query.get('layout');
-  if (query.has('grade')) state.gradeId = query.get('grade');
-  if (query.has('size')) state.sizeId = query.get('size');
-  if (query.has('position')) state.captionPosition = query.get('position');
+  state.layoutId = known(query, 'layout', LAYOUTS) ?? state.layoutId;
+  state.gradeId = known(query, 'grade', GRADES) ?? state.gradeId;
+  state.sizeId = known(query, 'size', EXPORT_SIZES) ?? state.sizeId;
+  if (['top', 'middle', 'bottom'].includes(query.get('position'))) state.captionPosition = query.get('position');
   const size = sizeById(state.sizeId);
   const rects = panelRects(state.layoutId, size.w, size.h);
   scene.forEach((spec, i) => {

@@ -39,6 +39,7 @@ button, .button {
   font: inherit; cursor: pointer; display: inline-block;
 }
 button:hover, .button:hover { border-color: var(--pink); }
+button:focus-visible, .button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .primary { background: linear-gradient(90deg, #ff7a3c, var(--pink)); border-color: transparent; color: #1a0826; font-weight: 700; }
 .big { font-size: 15px; padding: 9px 18px; }
 .seg { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -74,9 +75,17 @@ body.shot-cover { background: #000; }
 body.shot-cover .topbar, body.shot-cover .column, body.shot-cover .chips, body.shot-cover .exportbar { display: none; }
 body.shot-cover .app { display: block; padding: 0; }
 body.shot-cover .preview-wrap { border: 0; padding: 0; height: 100vh; background: #000; }
+/* Narrow screens: the page scrolls as a whole. Without `flex: none` the preview row collapsed to 0px and the chips and
+   export button were painted over the layout picker. */
 @media (max-width: 1000px) {
+  html, body { height: auto; min-height: 100%; }
   body { overflow: auto; }
-  .app { grid-template-columns: 1fr; }
-  .stage { order: -1; }
+  .topbar { flex-direction: column; gap: 4px; }
+  .app { flex: none; min-height: auto; grid-template-columns: 1fr; }
+  .stage { order: -1; min-height: auto; }
+  .preview-wrap { flex: none; min-height: 120px; }
+  #cover { max-height: 70vh; }
+  .chips { flex-wrap: wrap; }
+  .exportbar { position: sticky; bottom: 0; z-index: 2; padding: 8px 0; background: var(--bg); }
   .column { overflow: visible; }
 }

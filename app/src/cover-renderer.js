@@ -6,6 +6,7 @@ import { applyGrade } from './color-grades.js';
 import { drawLettering } from './poster-lettering.js';
 
 const GUTTER_INK = '#14071c';
+const HIGHLIGHT_INK = '#2de2e6'; // preview-only outline of the selected panel; same cyan as --cyan in style.css
 
 function drawEmptyPanel(ctx, rect, index, showHint) {
   const grad = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
@@ -30,6 +31,7 @@ function drawEmptyPanel(ctx, rect, index, showHint) {
  * @param {{placeholders?: boolean, highlight?: number}} [opts]  preview-only extras
  */
 export function renderCover(canvas, w, h, st, opts = {}) {
+  // Assigning canvas.width/height clears the canvas and resets its state, so only do it when the size really changes.
   if (canvas.width !== w) canvas.width = w;
   if (canvas.height !== h) canvas.height = h;
   const ctx = canvas.getContext('2d');
@@ -42,7 +44,7 @@ export function renderCover(canvas, w, h, st, opts = {}) {
   const rects = panelRects(st.layoutId, w, h);
   rects.forEach((rect, i) => {
     const panel = st.panels[i];
-    if (panel.img) drawPhotoInRect(ctx, rect, panel);
+    if (panel?.img) drawPhotoInRect(ctx, rect, panel);
     else drawEmptyPanel(ctx, rect, i, opts.placeholders);
   });
 
@@ -59,7 +61,7 @@ export function renderCover(canvas, w, h, st, opts = {}) {
   if (opts.highlight != null && rects[opts.highlight]) {
     const r = rects[opts.highlight];
     ctx.save();
-    ctx.strokeStyle = '#2de2e6';
+    ctx.strokeStyle = HIGHLIGHT_INK;
     ctx.lineWidth = Math.max(2, Math.min(w, h) * 0.006);
     ctx.strokeRect(r.x + ctx.lineWidth / 2, r.y + ctx.lineWidth / 2, r.w - ctx.lineWidth, r.h - ctx.lineWidth);
     ctx.restore();

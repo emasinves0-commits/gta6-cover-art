@@ -6,6 +6,9 @@ export const FIT_MODES = [
   { id: 'fit', label: 'Fit whole photo', anchorY: 0.5, whole: true },
 ];
 
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+/** Pixel size of an image or of the canvas that shrinkIfHuge may hand back (canvases have width/height only). */
 export function imageSize(img) {
   return { iw: img.naturalWidth || img.width, ih: img.naturalHeight || img.height };
 }
@@ -32,8 +35,8 @@ export function placePhoto(img, rect, panel) {
   const rx = axisRange(rect.w, w, 0.5);
   const ry = axisRange(rect.h, h, mode.anchorY);
   const limits = { minX: rx.lo / rect.w, maxX: rx.hi / rect.w, minY: ry.lo / rect.h, maxY: ry.hi / rect.h };
-  const ox = Math.min(limits.maxX, Math.max(limits.minX, panel.ox));
-  const oy = Math.min(limits.maxY, Math.max(limits.minY, panel.oy));
+  const ox = clamp(panel.ox, limits.minX, limits.maxX);
+  const oy = clamp(panel.oy, limits.minY, limits.maxY);
   return {
     x: rect.x + (rect.w - w) * 0.5 + ox * rect.w,
     y: rect.y + (rect.h - h) * mode.anchorY + oy * rect.h,
@@ -51,8 +54,8 @@ export function clampPanelOffset(panel, rect) {
     return;
   }
   const { limits } = placePhoto(panel.img, rect, panel);
-  panel.ox = Math.min(limits.maxX, Math.max(limits.minX, panel.ox));
-  panel.oy = Math.min(limits.maxY, Math.max(limits.minY, panel.oy));
+  panel.ox = clamp(panel.ox, limits.minX, limits.maxX);
+  panel.oy = clamp(panel.oy, limits.minY, limits.maxY);
 }
 
 /** Draws the panel's photo clipped to `rect`; "Fit whole photo" sits on a blurred, darkened copy of itself. */
