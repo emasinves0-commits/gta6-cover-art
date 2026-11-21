@@ -40,7 +40,7 @@ function drawEmptyPanel(ctx, rect, index, showHint) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const px = Math.min(rect.w, rect.h) * 0.3;
-  ctx.font = `${px}px Anton, Impact, sans-serif`;
+  ctx.font = `${px}px "Bebas Neue", Impact, sans-serif`;
   ctx.fillText(String(index + 1), rect.x + rect.w / 2, rect.y + rect.h / 2);
   ctx.font = `${px * 0.2}px sans-serif`;
   ctx.fillText('drop a photo', rect.x + rect.w / 2, rect.y + rect.h / 2 + px * 0.62);
