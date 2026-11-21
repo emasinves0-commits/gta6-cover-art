@@ -36,6 +36,7 @@ License, with the license texts in `app/fonts/OFL.txt`. No studio logos, artwork
 
     node serve.ts            # http://localhost:8080 (pick another port with: node serve.ts --port 8123)
     mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts   # the hand-in: app/, screenshots/, dossier.json
+    node main.ts --help       # usage; also accepts --layout <id> and --grade <id>, validated against the app's lists
 
 Screenshot scenes (no interaction needed): `?shot=editor&photo=boulevard&caption=Boulevard%20Kings`,
 `?shot=cover&photo=pier&caption=Pier%20Pressure`; optional `layout`, `grade`, `size`, `tagline`, `subtitle`, `position`,
@@ -44,6 +45,14 @@ Screenshot scenes (no interaction needed): `?shot=editor&photo=boulevard&caption
 
     node scripts/shots.mjs            # needs Chrome + ffmpeg: regenerates screenshots/ from shots.json via the DevTools protocol
     node scripts/render-smoke.mjs     # no browser: runs the whole render path on a mock canvas and checks the arithmetic
+
+## R4 revision
+
+The R3 entry was rejected on one server check, `thinking_revised`: no file took its final content from two or more
+write/edit steps. R4 is a revision pass with no visual change (the four screenshots and the rendered output are
+byte-identical): `main.ts` gained input validation (layout and grade checked against the app's own lists, writable
+output directory, unknown options rejected) and a `--help` flag; `cover-renderer.js` got a documented
+`createGutterGradient` helper and named constants for the selection-outline width; `shots.json` got a `comment` per shot.
 
 ## Source map
 
