@@ -1,9 +1,9 @@
-Note (Sunset Cover Lab): this file covers the bundled font Anton Regular, version 2.116 (app/fonts/Anton-Regular.ttf).
+Note (Sunset Cover Lab): this file covers the bundled font Bebas Neue Regular, version 2.000 (app/fonts/BebasNeue-Regular.ttf).
 The app uses it for the poster caption, the tagline, the panel numbers and the page title; see app/style.css
 (@font-face) and app/src/poster-lettering.js (LETTERING_FONT). The font file keeps its original name
-(Anton-Regular.ttf). The license text below is unmodified.
+(BebasNeue-Regular.ttf). The license text below is unmodified.
 
-Copyright 2020 The Anton Project Authors (https://github.com/googlefonts/AntonFont.git)
+Copyright 2019 The Bebas Neue Project Authors (https://github.com/dharmatype/Bebas-Neue)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
