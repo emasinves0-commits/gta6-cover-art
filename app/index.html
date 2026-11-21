@@ -9,7 +9,7 @@
 <body>
 <header class="topbar">
   <h1>Sunset Cover Lab</h1>
-  <p>Photos + a caption = a multi-panel poster cover, exported as PNG. Your photos never leave this page.</p>
+  <p>Photos + a caption = a movie-poster cover with review strip, role tags, striped title and seal, exported as PNG. Your photos never leave this page.</p>
 </header>
 <main class="app">
   <aside class="column" id="leftColumn">
@@ -25,7 +25,7 @@
         <button id="fillAll" type="button">Use for all panels</button>
       </div>
       <p class="hint">Drop photos on the preview or a chip. Several files fill several panels. Drag the photo in the preview to reposition it.</p>
-      <p class="hint">Keys (outside text fields): <kbd>1</kbd>&ndash;<kbd>4</kbd> pick a panel, arrows nudge the photo, <kbd>R</kbd> resets its position, <kbd>E</kbd> exports. Photos up to 40&nbsp;MB.</p>
+      <p class="hint">Keys (outside text fields): <kbd>1</kbd>&ndash;<kbd>7</kbd> pick a panel, arrows nudge the photo, <kbd>R</kbd> resets its position, <kbd>E</kbd> exports. Photos up to 40&nbsp;MB.</p>
       <div class="field"><span>Crop</span><div id="fitPicker" class="seg"></div></div>
       <div class="field"><span>Zoom <output id="zoomOut">1.00x</output></span>
         <input id="zoom" type="range" min="1" max="3" step="0.01" value="1"></div>
@@ -54,7 +54,7 @@
     </section>
     <section>
       <h2>5 &middot; Caption</h2>
-      <label class="field"><span>Caption</span><input id="caption" type="text" maxlength="48" value="Sunset Heist"></label>
+      <label class="field"><span>Caption</span><input id="caption" type="text" maxlength="48" value="Boulevard Kings"></label>
       <label class="field"><span>Tagline</span><input id="tagline" type="text" maxlength="64"></label>
       <div class="field"><span>Size <output id="captionSizeOut">100%</output></span>
         <input id="captionSize" type="range" min="0.5" max="1.5" step="0.01" value="1"></div>
@@ -63,6 +63,25 @@
         <label>Extrusion <input id="extrusionColor" type="color" value="#ff2d7a"></label>
       </div>
       <div class="field"><span>Position</span><div id="positionPicker" class="seg"></div></div>
+    </section>
+    <section id="posterDetails">
+      <h2>6 &middot; Poster details</h2>
+      <div class="field"><span>Title style</span><div id="titleStylePicker" class="seg"></div></div>
+      <label class="field"><span>Script subtitle</span><input id="subtitle" type="text" maxlength="40" placeholder="under the title"></label>
+      <label class="check"><input id="reviewOn" type="checkbox" checked> Review strip (stars, quote, VOL. badge)</label>
+      <label class="field"><span>Review quote</span><input id="reviewQuote" type="text" maxlength="70"></label>
+      <div class="row pair">
+        <label class="field"><span>Gazette</span><input id="reviewSource" type="text" maxlength="32"></label>
+        <label class="field"><span>Badge</span><input id="badgeText" type="text" maxlength="12"></label>
+      </div>
+      <label class="check"><input id="tagsOn" type="checkbox" checked> Role tags on the panels</label>
+      <label class="field"><span>Role tag, panel <output id="rolePanel">1</output></span>
+        <input id="role" type="text" maxlength="24" placeholder="THE DRIVER" aria-describedby="roleHint"></label>
+      <p id="roleHint" class="hint">Empty = automatic tag. A single &ldquo;-&rdquo; hides this panel's tag.</p>
+      <label class="check"><input id="sealOn" type="checkbox" checked> Gold seal</label>
+      <label class="field"><span>Seal text</span><input id="sealText" type="text" maxlength="30"></label>
+      <label class="check"><input id="detailsOn" type="checkbox" checked> Billing, barcode &amp; COMING SOON</label>
+      <label class="field"><span>Billing line</span><input id="billing" type="text" maxlength="64"></label>
     </section>
   </aside>
 </main>

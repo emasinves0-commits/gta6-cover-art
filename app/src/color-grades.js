@@ -1,6 +1,6 @@
 // Colour grades written from canvas filters, blended gradient overlays, bloom and a vignette. `strength` (0..1)
-// scales every part of a grade, so 0 is the untouched photo and 1 the full look. Six looks: none, Vice Sunset, Neon
-// Nights, Palm Noir, Golden Hour and Teal Chrome. "none" has no `filter`, which applyGrade treats as "leave alone".
+// scales every part of a grade, so 0 is the untouched photo and 1 the full look. Eight looks: none, Vice Sunset, Neon
+// Nights, Palm Noir, Golden Hour, Teal Chrome, Coral Heat and Twilight Gold. "none" has no `filter`, which applyGrade treats as "leave alone".
 const NEUTRAL = { saturate: 1, contrast: 1, brightness: 1, sepia: 0, grayscale: 0, 'hue-rotate': 0 };
 
 export const GRADES = [
@@ -66,6 +66,30 @@ export const GRADES = [
     ],
     bloom: 0.25,
     vignette: 0.6,
+  },
+  {
+    id: 'coral',
+    label: 'Coral Heat',
+    swatch: 'linear-gradient(180deg,#ffd0a0,#ff6a4d 55%,#b81d5a)',
+    filter: { saturate: 1.4, contrast: 1.12, brightness: 1.04 },
+    overlays: [
+      { angle: 160, stops: [[0, '#ffd0a0'], [0.5, '#ff6a4d'], [1, '#b81d5a']], mode: 'soft-light', alpha: 0.95 },
+      { angle: 180, stops: [[0, '#ff8a5c'], [1, '#e0245e']], mode: 'overlay', alpha: 0.3 },
+    ],
+    bloom: 0.3,
+    vignette: 0.45,
+  },
+  {
+    id: 'twilight',
+    label: 'Twilight Gold',
+    swatch: 'linear-gradient(180deg,#3a2a8a,#c46a7a 50%,#ffc15a)',
+    filter: { saturate: 1.15, contrast: 1.18, brightness: 0.97, sepia: 0.12 },
+    overlays: [
+      { angle: 180, stops: [[0, '#3a2a8a'], [0.45, '#c46a7a'], [0.8, '#ffc15a'], [1, '#ffd98a']], mode: 'soft-light', alpha: 1 },
+      { angle: 180, stops: [[0, '#2a1a6a'], [1, '#f0a030']], mode: 'overlay', alpha: 0.3 },
+    ],
+    bloom: 0.3,
+    vignette: 0.55,
   },
 ];
 

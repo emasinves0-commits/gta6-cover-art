@@ -1,8 +1,12 @@
 // Where a photo lands inside a panel: fit mode, zoom and a drag offset (stored as a fraction of the panel size, so
 // the same placement holds at preview size and at export size). Also draws the photo and clamps offsets to bounds.
+// "Smart (face zone)" is not face detection: it simply keeps the upper-centre third of the photo, where people's heads
+// usually are in portraits, in view when the panel crops the photo vertically (and zoom grows out of that zone).
+export const SMART_ANCHOR_Y = 0.2;
 export const FIT_MODES = [
   { id: 'fill-centre', label: 'Fill centre', anchorY: 0.5, whole: false },
   { id: 'fill-top', label: 'Fill top', anchorY: 0, whole: false },
+  { id: 'fill-smart', label: 'Smart (face zone)', anchorY: SMART_ANCHOR_Y, whole: false },
   { id: 'fit', label: 'Fit whole photo', anchorY: 0.5, whole: true },
 ];
 

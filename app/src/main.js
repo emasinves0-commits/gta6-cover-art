@@ -1,18 +1,21 @@
 // The editor UI: builds the pickers, wires every control to the shared state, repaints the live preview and the
 // panel chips, handles drag-to-reposition and photo drops, and runs the export.
 import { state, subscribe, notify, resetLook, EXPORT_SIZES, sizeById } from './cover-state.js';
-import { LAYOUTS, layoutById, panelRects } from './panel-layouts.js';
+import { LAYOUTS, layoutById, panelRects, rectsForState } from './panel-layouts.js';
 import { FIT_MODES, clampPanelOffset } from './photo-placement.js';
 import { GRADES } from './color-grades.js';
 import { renderCover, renderPanelChip } from './cover-renderer.js';
 import { loadImageFromFile, onlyImageFiles } from './photo-loading.js';
 import { exportCover } from './png-export.js';
 import { runShot } from './shot-mode.js';
+import { roleFor } from './poster-furniture.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('cover');
 const PREVIEW_LONG_SIDE = 1100;
 const POSITIONS = [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']];
+const TITLE_STYLES = [['chrome', 'Chrome (striped)'], ['gradient', 'Gradient']];
+const FONTS = ['100px Anton', '40px Pacifico'];
 
 const panelCount = () => layoutById(state.layoutId).count;
 const previewSize = () => {
@@ -20,12 +23,19 @@ const previewSize = () => {
   const k = Math.min(1, PREVIEW_LONG_SIDE / Math.max(w, h));
   return { w: Math.round(w * k), h: Math.round(h * k) };
 };
-const rectOfPanel = (index, w, h) => panelRects(state.layoutId, w, h)[index];
+const rectOfPanel = (index, w, h) => rectsForState(state, w, h)[index];
 
 /** Pulls every panel's offset back inside bounds for the current layout, size, zoom and fit. */
 function clampAllPanels() {
   const { w, h } = sizeById(state.sizeId);
-  panelRects(state.layoutId, w, h).forEach((rect, i) => clampPanelOffset(state.panels[i], rect));
+  rectsForState(state, w, h).forEach((rect, i) => clampPanelOffset(state.panels[i], rect));
+}
+
+/** After anything that moves the panel rectangles (layout, size, furniture toggles): re-clamp, rebuild the chips, repaint. */
+function layoutChanged() {
+  clampAllPanels();
+  buildChips();
+  notify();
 }
 
 function makeButton(text, pressed, onClick, extraClass) {
@@ -46,15 +56,13 @@ function buildLayoutPicker() {
     const b = makeButton('', layout.id === state.layoutId, () => {
       state.layoutId = layout.id;
       state.selected = Math.min(state.selected, layout.count - 1);
-      clampAllPanels();
-      buildChips();
-      notify();
+      layoutChanged();
     });
     b.title = `${layout.label} (${layout.count} panels)`;
     b.dataset.layout = layout.id;
     const mini = document.createElement('div');
     mini.className = 'mini';
-    for (const r of layout.build(400, 300)) {
+    for (const r of panelRects(layout.id, 400, 300)) {
       const i = document.createElement('i');
       Object.assign(i.style, { left: `${r.x / 4}%`, top: `${r.y / 3}%`, width: `${r.w / 4}%`, height: `${r.h / 3}%` });
       mini.appendChild(i);
@@ -76,9 +84,7 @@ function buildSimplePickers() {
   $('sizePicker').replaceChildren(...EXPORT_SIZES.map((s) => {
     const b = makeButton(`${s.label} ${s.id.replace('x', '×')}`, false, () => {
       state.sizeId = s.id;
-      clampAllPanels();
-      buildChips();
-      notify();
+      layoutChanged();
     });
     b.dataset.size = s.id;
     return b;
@@ -97,6 +103,11 @@ function buildSimplePickers() {
     b.dataset.position = id;
     return b;
   }));
+  $('titleStylePicker').replaceChildren(...TITLE_STYLES.map(([id, label]) => {
+    const b = makeButton(label, false, () => { state.titleStyle = id; notify(); });
+    b.dataset.style = id;
+    return b;
+  }));
 }
 
 // ---- chips ---------------------------------------------------------------------------------------------------
@@ -104,7 +115,7 @@ function buildChips() {
   const host = $('chipStrip');
   host.replaceChildren();
   const { w, h } = sizeById(state.sizeId);
-  const rects = panelRects(state.layoutId, w, h);
+  const rects = rectsForState(state, w, h);
   rects.forEach((rect, i) => {
     const chip = document.createElement('button');
     chip.type = 'button';
@@ -164,7 +175,12 @@ function syncControls() {
   for (const b of $('sizePicker').children) b.setAttribute('aria-pressed', String(b.dataset.size === state.sizeId));
   for (const b of $('gradePicker').children) b.setAttribute('aria-pressed', String(b.dataset.grade === state.gradeId));
   for (const b of $('positionPicker').children) b.setAttribute('aria-pressed', String(b.dataset.position === state.captionPosition));
-  for (const id of ['caption', 'tagline']) if (document.activeElement !== $(id)) $(id).value = state[id];
+  for (const b of $('titleStylePicker').children) b.setAttribute('aria-pressed', String(b.dataset.style === state.titleStyle));
+  for (const id of TEXT_FIELDS) if (document.activeElement !== $(id)) $(id).value = state[id];
+  for (const [id, key] of TOGGLES) $(id).checked = state[key];
+  $('rolePanel').textContent = String(state.selected + 1);
+  $('role').placeholder = roleFor({ role: '' }, state.selected);
+  if (document.activeElement !== $('role')) $('role').value = panel.role;
   $('captionColor').value = state.captionColor;
   $('extrusionColor').value = state.extrusionColor;
 }
@@ -228,8 +244,16 @@ $('zoom').addEventListener('input', (e) => {
 
 // ---- text and colour controls --------------------------------------------------------------------------------
 const bindState = (id, key, parse = (v) => v) => $(id).addEventListener('input', (e) => { state[key] = parse(e.target.value); notify(); });
-bindState('caption', 'caption');
-bindState('tagline', 'tagline');
+// Text inputs bound one-to-one to a state field (caption, tagline and the poster-details fields).
+const TEXT_FIELDS = ['caption', 'tagline', 'subtitle', 'reviewQuote', 'reviewSource', 'badgeText', 'sealText', 'billing'];
+for (const id of TEXT_FIELDS) bindState(id, id);
+// Checkboxes for the furniture groups: [element id, state key]. They change the free frame, so the layout is rebuilt.
+const TOGGLES = [['reviewOn', 'reviewOn'], ['tagsOn', 'tagsOn'], ['sealOn', 'sealOn'], ['detailsOn', 'detailsOn']];
+for (const [id, key] of TOGGLES) {
+  $(id).addEventListener('change', (e) => { state[key] = e.target.checked; layoutChanged(); });
+}
+// The role tag of the selected panel; empty means "automatic", a lone "-" hides this panel's tag.
+$('role').addEventListener('input', (e) => { state.panels[state.selected].role = e.target.value; notify(); });
 bindState('captionSize', 'captionSize', Number);
 bindState('captionColor', 'captionColor');
 bindState('extrusionColor', 'extrusionColor');
@@ -241,7 +265,7 @@ const toCanvasPoint = (e) => {
   const box = canvas.getBoundingClientRect();
   return { x: ((e.clientX - box.left) * canvas.width) / box.width, y: ((e.clientY - box.top) * canvas.height) / box.height };
 };
-const panelAt = (pt) => panelRects(state.layoutId, canvas.width, canvas.height).findIndex((r) => pt.x >= r.x && pt.x < r.x + r.w && pt.y >= r.y && pt.y < r.y + r.h);
+const panelAt = (pt) => rectsForState(state, canvas.width, canvas.height).findIndex((r) => pt.x >= r.x && pt.x < r.x + r.w && pt.y >= r.y && pt.y < r.y + r.h);
 
 canvas.addEventListener('pointerdown', (e) => {
   const pt = toCanvasPoint(e);
@@ -300,10 +324,8 @@ $('exportBtn').addEventListener('click', runExport);
 // ---- reset and keyboard shortcuts ----------------------------------------------------------------------------
 $('resetAll').addEventListener('click', () => {
   resetLook();
-  buildChips();
-  clampAllPanels();
   $('status').textContent = 'Look reset to the defaults; photos kept.';
-  notify();
+  layoutChanged();
 });
 
 const NUDGE = 0.01; // fraction of the panel size per arrow press
@@ -312,7 +334,7 @@ document.addEventListener('keydown', (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.target.closest?.('input, textarea, select')) return; // never steal keys from text fields and sliders
   const key = e.key;
-  if (/^[1-4]$/.test(key) && Number(key) <= panelCount()) {
+  if (/^[1-7]$/.test(key) && Number(key) <= panelCount()) {
     state.selected = Number(key) - 1;
     notify();
   } else if (key === 'e' || key === 'E') {
@@ -336,7 +358,7 @@ buildLayoutPicker();
 buildSimplePickers();
 buildChips();
 const query = new URLSearchParams(location.search);
-if (document.fonts) document.fonts.load('100px Anton').then(requestPaint);
+if (document.fonts) Promise.all(FONTS.map((f) => document.fonts.load(f))).then(requestPaint);
 if (query.has('shot')) {
   runShot(query, requestPaint).then(() => { buildLayoutPicker(); buildChips(); requestPaint(); });
 } else {

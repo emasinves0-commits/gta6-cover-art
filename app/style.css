@@ -5,6 +5,13 @@
   font-style: normal;
   font-display: block;
 }
+@font-face {
+  font-family: 'Pacifico';
+  src: url('./fonts/Pacifico-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
 :root {
   --bg: #130a20; --card: #1e1230; --line: #3a2656; --ink: #f6ecff; --dim: #b9a4d6;
   --pink: #ff4f9a; --orange: #ff9a3c; --cyan: #2de2e6;
@@ -47,7 +54,7 @@ button:focus-visible, .button:focus-visible, input:focus-visible { outline: 2px 
 .seg button[aria-pressed=true], .layout-picker button[aria-pressed=true], .grade-picker button[aria-pressed=true], .chip[aria-pressed=true] {
   border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset; background: #35205a;
 }
-.layout-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.layout-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .layout-picker button { padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; }
 .mini { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #14071c; border-radius: 2px; }
 .mini i { position: absolute; background: linear-gradient(180deg, #ff9a3c, #c2185b); }
@@ -62,13 +69,19 @@ button:focus-visible, .button:focus-visible, input:focus-visible { outline: 2px 
 .preview-wrap.dragging { border-color: var(--cyan); background: #12202a; }
 #cover { max-width: 100%; max-height: 100%; box-shadow: 0 10px 40px #0009; cursor: grab; touch-action: none; }
 #cover.dragging { cursor: grabbing; }
-.chips { display: flex; gap: 8px; align-items: flex-end; justify-content: center; min-height: 66px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; justify-content: center; min-height: 66px; }
 .chip { position: relative; padding: 2px; border-radius: 7px; line-height: 0; }
 .chip canvas { border-radius: 4px; display: block; }
 .chip b {
   position: absolute; left: 5px; top: 4px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--pink); color: #1a0826;
   font: 700 11px/18px system-ui; text-align: center;
 }
+.check { display: flex; align-items: center; gap: 8px; margin: 10px 0 2px; color: var(--ink); cursor: pointer; }
+.check input { accent-color: var(--pink); width: 15px; height: 15px; margin: 0; }
+.pair { align-items: flex-start; flex-wrap: nowrap; }
+.pair .field { flex: 1 1 0; min-width: 0; }
+.pair .field input { width: 100%; }
+#posterDetails .field input[type=text] { width: 100%; }
 .exportbar { display: flex; align-items: center; gap: 12px; }
 #status { color: var(--cyan); }
 body.shot-cover { background: #000; }

@@ -1,11 +1,14 @@
-// Draws the whole cover onto a canvas of any size: gutters, panels, colour grade, lettering. The live preview and the
-// PNG export both call renderCover, so what you see is what you export. Also draws the small per-panel chips.
-import { panelRects } from './panel-layouts.js';
+// Draws the whole cover onto a canvas of any size: gutters, panels, colour grade, panel keylines, lettering, poster
+// furniture. The live preview and the PNG export both call renderCover, so what you see is what you export. Also
+// draws the small per-panel chips.
+import { posterFrame, rectsForState } from './panel-layouts.js';
 import { drawPhotoInRect } from './photo-placement.js';
 import { applyGrade } from './color-grades.js';
 import { drawLettering } from './poster-lettering.js';
+import { drawFurniture, drawPanelFrames } from './poster-furniture.js';
 
-const GUTTER_INK = '#14071c';
+const GUTTER_TOP = '#2a0f3f';
+const GUTTER_BOTTOM = '#0d0416';
 const HIGHLIGHT_INK = '#2de2e6'; // preview-only outline of the selected panel; same cyan as --cyan in style.css
 
 function drawEmptyPanel(ctx, rect, index, showHint) {
@@ -38,10 +41,14 @@ export function renderCover(canvas, w, h, st, opts = {}) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = GUTTER_INK;
+  const ground = ctx.createLinearGradient(0, 0, 0, h);
+  ground.addColorStop(0, GUTTER_TOP);
+  ground.addColorStop(1, GUTTER_BOTTOM);
+  ctx.fillStyle = ground;
   ctx.fillRect(0, 0, w, h);
 
-  const rects = panelRects(st.layoutId, w, h);
+  const frame = posterFrame(w, h, st);
+  const rects = rectsForState(st, w, h);
   rects.forEach((rect, i) => {
     const panel = st.panels[i];
     if (panel?.img) drawPhotoInRect(ctx, rect, panel);
@@ -49,14 +56,19 @@ export function renderCover(canvas, w, h, st, opts = {}) {
   });
 
   applyGrade(ctx, w, h, st.gradeId, st.gradeStrength);
-  drawLettering(ctx, w, h, {
+  drawPanelFrames(ctx, rects);
+  const lettering = drawLettering(ctx, w, h, {
     caption: st.caption,
     tagline: st.tagline,
+    subtitle: st.subtitle,
     size: st.captionSize,
     fill: st.captionColor,
     extrusion: st.extrusionColor,
     position: st.captionPosition,
+    style: st.titleStyle,
+    frame,
   });
+  drawFurniture(ctx, w, h, st, rects, frame, lettering);
 
   if (opts.highlight != null && rects[opts.highlight]) {
     const r = rects[opts.highlight];

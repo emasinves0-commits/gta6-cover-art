@@ -1,10 +1,11 @@
-// One-click export: renders the cover to an offscreen canvas at the exact size and downloads it as a PNG.
+// One-click export: renders the cover to an offscreen canvas at the exact size and downloads it as a PNG. Both bundled
+// fonts (Anton lettering, Pacifico subtitle) are awaited first, so the file never contains fallback letterforms.
 import { renderCover } from './cover-renderer.js';
 import { sizeById } from './cover-state.js';
 
 export async function renderToBlob(st, sizeId) {
   const size = sizeById(sizeId);
-  if (document.fonts) await document.fonts.load('100px Anton');
+  if (document.fonts) await Promise.all(['100px Anton', '40px Pacifico'].map((f) => document.fonts.load(f)));
   const canvas = document.createElement('canvas');
   renderCover(canvas, size.w, size.h, st);
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));

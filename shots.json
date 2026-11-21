@@ -1,6 +1,6 @@
 [
-  { "name": "1-cover.jpg", "query": "?shot=editor&photo=pier&caption=Sunset%20Heist&size=1920x1080", "export": "1920x1080", "w": 1280, "h": 720 },
-  { "name": "2-editor.jpg", "query": "?shot=editor&photo=boulevard&caption=Boulevard%20Queen&size=1920x1080", "w": 1280, "h": 720 },
-  { "name": "3-portrait.jpg", "query": "?shot=editor&photo=boulevard-tall&caption=Boulevard%20Queen&size=1080x1350&layout=hero-side&grade=neon", "export": "1080x1350", "w": 1024, "h": 1280 },
-  { "name": "4-square.jpg", "query": "?shot=editor&photo=pier&caption=Pier%20Pressure&size=1080x1080&layout=grid-2x2&grade=golden", "export": "1080x1080", "w": 1024, "h": 1024 }
+  { "name": "1-cover.jpg", "query": "?shot=editor&photo=boulevard&caption=Boulevard%20Kings&subtitle=a%20coast%20of%20our%20own&size=1920x1080&layout=cast-mosaic&grade=vice&title=chrome", "export": "1920x1080", "w": 1280, "h": 720 },
+  { "name": "2-editor.jpg", "query": "?shot=editor&focus=details&photo=boulevard&caption=Boulevard%20Kings&size=1920x1080&layout=cast-mosaic&grade=vice&title=chrome", "viewport": [1600, 900], "w": 1280, "h": 720 },
+  { "name": "3-portrait.jpg", "query": "?shot=editor&photo=boulevard-tall&caption=Golden%20Hour%20Gang&subtitle=nobody%20sleeps%20tonight&tagline=Five%20friends.%20One%20night.%20Zero%20brakes.&quote=Pure%20sunset%20adrenaline&source=The%20Pier%20Post&size=1080x1350&layout=hero-closeup&grade=twilight&title=chrome", "export": "1080x1350", "w": 1024, "h": 1280 },
+  { "name": "4-square.jpg", "query": "?shot=editor&photo=pier&caption=Pier%20Pressure&subtitle=catch%20of%20the%20day&tagline=Some%20catches%20bite%20back.&quote=A%20reel%20good%20time&source=The%20Dockside%20Daily&size=1080x1080&layout=grid-2x2&grade=coral&title=gradient", "export": "1080x1080", "w": 1024, "h": 1024 }
 ]

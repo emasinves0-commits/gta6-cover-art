@@ -12,6 +12,7 @@ const args = process.argv.slice(2);
 const portIndex = args.indexOf('--port');
 const requested = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
 const port = Number.isInteger(requested) && requested > 0 && requested < 65536 ? requested : 8080;
+if (portIndex !== -1 && port !== requested) console.warn(`--port ${args[portIndex + 1]} is not a valid port, using ${port}`);
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -63,6 +64,7 @@ createServer((request, response) => {
     if (!stats.isFile()) throw new Error('not a file');
     size = stats.size;
   } catch {
+    console.warn(`404 ${pathname}`); // a missing font, script or photo is the usual cause of a broken page: say so
     response.writeHead(404).end('not found');
     return;
   }

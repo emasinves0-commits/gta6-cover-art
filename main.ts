@@ -1,7 +1,7 @@
 // Hand-in program (Node 22, standard library only): copies the static app and the screenshots beside this file into
 // the output directory, then writes dossier.json with the vendored make.fun library.
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
-import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-app.ts';
@@ -33,5 +33,16 @@ const caps = {
   app_max_bytes: 50331648,
   app_path_max_bytes: 1000,
 };
+
+// Early, readable warnings for the two screenshot rules that are easiest to break by accident (the dossier build
+// itself is the authority; this only saves a round trip). Warnings never change what is written.
+if (existsSync(shotsDir)) {
+  const shots = readdirSync(shotsDir).sort();
+  if (shots.length > caps.screenshots.max) console.warn(`warning: ${shots.length} screenshots, at most ${caps.screenshots.max} count`);
+  for (const name of shots) {
+    const bytes = statSync(join(shotsDir, name)).size;
+    if (bytes > caps.screenshots.max_bytes) console.warn(`warning: screenshots/${name} is ${bytes} bytes (cap ${caps.screenshots.max_bytes})`);
+  }
+}
 writeFileSync(join(outputRoot, 'dossier.json'), buildDossier(outputRoot, caps));
 console.log(`hand-in written to ${resolvedOutput} (dossier.json, app/, screenshots/)`);

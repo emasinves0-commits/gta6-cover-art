@@ -6,7 +6,8 @@ export const MAX_FILE_BYTES = 40 * 1024 * 1024;
 export function loadImageFromUrl(url, label = 'the image') {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
+    // An image without pixel dimensions (an SVG with no width/height, say) would make every crop scale 0 or NaN.
+    img.onload = () => (img.naturalWidth > 0 && img.naturalHeight > 0 ? resolve(img) : reject(new Error(`${label} has no pixel size`)));
     // `label` keeps the message readable: a data: URL for a photo can be megabytes long.
     img.onerror = () => reject(new Error(`could not load ${label}`));
     img.src = url;
