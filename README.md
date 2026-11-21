@@ -37,6 +37,7 @@ License, with the license texts in `app/fonts/OFL.txt`. No studio logos, artwork
     node serve.ts            # http://localhost:8080 (pick another port with: node serve.ts --port 8123)
     mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts   # the hand-in: app/, screenshots/, dossier.json
     node main.ts --help       # usage; also accepts --layout <id> and --grade <id>, validated against the app's lists
+    (cd out && find . -type f | sort | xargs sha256sum | sha256sum)   # tree hash; the render is deterministic
 
 Screenshot scenes (no interaction needed): `?shot=editor&photo=boulevard&caption=Boulevard%20Kings`,
 `?shot=cover&photo=pier&caption=Pier%20Pressure`; optional `layout`, `grade`, `size`, `tagline`, `subtitle`, `position`,
@@ -53,6 +54,15 @@ write/edit steps. R4 is a revision pass with no visual change (the four screensh
 byte-identical): `main.ts` gained input validation (layout and grade checked against the app's own lists, writable
 output directory, unknown options rejected) and a `--help` flag; `cover-renderer.js` got a documented
 `createGutterGradient` helper and named constants for the selection-outline width; `shots.json` got a `comment` per shot.
+
+## Fonts
+
+Anton and Pacifico come from Google Fonts under the SIL Open Font License (license text: `app/fonts/OFL.txt`):
+
+- `app/fonts/Anton-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf
+  (170,812 bytes, sha256 `a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab`, re-downloaded and
+  confirmed byte-identical on 2026-11-20).
+- `app/fonts/Pacifico-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/pacifico/Pacifico-Regular.ttf
 
 ## Source map
 
