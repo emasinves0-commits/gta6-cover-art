@@ -76,7 +76,7 @@ export async function runShot(query, requestPaint) {
   });
   state.selected = 0;
   requestPaint();
-  if (document.fonts) await Promise.all(['100px Anton', '40px Pacifico'].map((f) => document.fonts.load(f)));
+  if (document.fonts) await Promise.all(['100px Bebas Neue', '40px Pacifico'].map((f) => document.fonts.load(f)));
   if (document.fonts) await document.fonts.ready;
   requestPaint();
   if (query.get('focus') === 'details') document.getElementById('posterDetails')?.scrollIntoView({ block: 'start' });
