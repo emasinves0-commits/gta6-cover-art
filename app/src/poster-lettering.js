@@ -2,7 +2,7 @@
 // glyphs with a white outline and a deep extrusion; "gradient": a smooth light-to-dark face), a tagline (in a slanted
 // chip for chrome) and a scrim that keeps the words readable. drawLettering also reserves room for the script subtitle
 // and returns the geometry of the whole block so poster-furniture.js can draw the subtitle and keep tags clear of it.
-export const LETTERING_FONT = 'Anton, Impact, "Arial Black", sans-serif';
+export const LETTERING_FONT = '"Bebas Neue", Impact, "Arial Black", sans-serif';
 const OUTLINE_INK = '#16081f';
 const CHIP_INK = 'rgba(10,4,18,0.9)';
 const CHIP_GOLD = '#f5b82e';
