@@ -6,7 +6,7 @@
 
 An offline, static web app for [make.fun's GTA 6 cover art bounty](https://make.fun/bounty/gta6-cover-art-01). It turns
 your photos and a caption into a multi-panel, sunset-graded movie-poster cover and exports it as a PNG. Everything is
-an original design; the bundled fonts are Anton (lettering) and Pacifico (script subtitle), both SIL Open Font
+an original design; the bundled fonts are Bebas Neue (lettering) and Pacifico (script subtitle), both SIL Open Font
 License, with the license texts in `app/fonts/OFL.txt`. No studio logos, artwork or fonts are used.
 
 ## What it does
@@ -57,12 +57,12 @@ output directory, unknown options rejected) and a `--help` flag; `cover-renderer
 
 ## Fonts
 
-Anton and Pacifico come from Google Fonts under the SIL Open Font License (license text: `app/fonts/OFL.txt`):
+Bebas Neue and Pacifico come from Google Fonts under the SIL Open Font License (license text: `app/fonts/OFL.txt`):
 
-- `app/fonts/Anton-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf
-  (170,812 bytes, sha256 `a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab`, re-downloaded from the Google
-  Fonts GitHub on 2026-11-21 after the file was deleted; sha256 verified and the four rendered screenshots are
-  byte-identical to the previous ones, so the output did not change).
+- `app/fonts/BebasNeue-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/bebasneue/BebasNeue-Regular.ttf
+  (61,400 bytes, sha256 `08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73`, downloaded from the Google
+  Fonts GitHub on 2026-11-21 as the new lettering font; sha256 verified. Bebas Neue is narrower and taller than the
+  previous lettering font, so the four rendered screenshots were regenerated and differ from the old ones.)
 - `app/fonts/Pacifico-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/pacifico/Pacifico-Regular.ttf
 
 ## Source map
