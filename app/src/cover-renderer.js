@@ -10,6 +10,24 @@ import { drawFurniture, drawPanelFrames } from './poster-furniture.js';
 const GUTTER_TOP = '#2a0f3f';
 const GUTTER_BOTTOM = '#0d0416';
 const HIGHLIGHT_INK = '#2de2e6'; // preview-only outline of the selected panel; same cyan as --cyan in style.css
+// The selection outline is 0.6% of the canvas's shorter side, so it looks equally thick on a 1080 square and a
+// 1920x1080 landscape; the floor keeps it visible (at least 2 px) when the preview canvas is scaled far down.
+const HIGHLIGHT_LINE_FRACTION = 0.006;
+const HIGHLIGHT_LINE_MIN_PX = 2;
+
+/**
+ * Builds the vertical gradient that fills the whole canvas before any panel is drawn. It shows through the gutters
+ * between panels, so it runs from the lighter purple at the top edge to the near-black at the bottom edge.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} h  canvas height in pixels; the gradient spans the full height at x = 0
+ * @returns {CanvasGradient}
+ */
+function createGutterGradient(ctx, h) {
+  const gradient = ctx.createLinearGradient(0, 0, 0, h);
+  gradient.addColorStop(0, GUTTER_TOP);
+  gradient.addColorStop(1, GUTTER_BOTTOM);
+  return gradient;
+}
 
 function drawEmptyPanel(ctx, rect, index, showHint) {
   const grad = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
@@ -41,10 +59,7 @@ export function renderCover(canvas, w, h, st, opts = {}) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
-  const ground = ctx.createLinearGradient(0, 0, 0, h);
-  ground.addColorStop(0, GUTTER_TOP);
-  ground.addColorStop(1, GUTTER_BOTTOM);
-  ctx.fillStyle = ground;
+  ctx.fillStyle = createGutterGradient(ctx, h);
   ctx.fillRect(0, 0, w, h);
 
   const frame = posterFrame(w, h, st);
@@ -74,7 +89,7 @@ export function renderCover(canvas, w, h, st, opts = {}) {
     const r = rects[opts.highlight];
     ctx.save();
     ctx.strokeStyle = HIGHLIGHT_INK;
-    ctx.lineWidth = Math.max(2, Math.min(w, h) * 0.006);
+    ctx.lineWidth = Math.max(HIGHLIGHT_LINE_MIN_PX, Math.min(w, h) * HIGHLIGHT_LINE_FRACTION);
     ctx.strokeRect(r.x + ctx.lineWidth / 2, r.y + ctx.lineWidth / 2, r.w - ctx.lineWidth, r.h - ctx.lineWidth);
     ctx.restore();
   }
