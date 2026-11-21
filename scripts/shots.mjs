@@ -22,7 +22,7 @@ const outIndex = args.indexOf('--out');
 const outDir = resolve(outIndex === -1 ? join(root, 'screenshots') : args[outIndex + 1]);
 const outValue = outIndex === -1 ? -1 : outIndex + 1; // index of the --out directory argument, if any
 const only = args.filter((a, i) => !a.startsWith('--') && i !== outValue);
-const SERVER_PORT = 8765;
+const SERVER_PORT = Number(process.env.SHOTS_PORT) || 8765; // override with SHOTS_PORT when 8765 is taken
 const DEBUG_PORT = 9333;
 const MAX_BYTES = 256 * 1024;
 const JPEG_QUALITIES = [3, 4, 5, 6, 8, 10, 13, 16]; // ffmpeg -q:v, lower is better; the first that fits the cap wins
