@@ -60,8 +60,9 @@ output directory, unknown options rejected) and a `--help` flag; `cover-renderer
 Anton and Pacifico come from Google Fonts under the SIL Open Font License (license text: `app/fonts/OFL.txt`):
 
 - `app/fonts/Anton-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf
-  (170,812 bytes, sha256 `a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab`, re-downloaded and
-  confirmed byte-identical on 2026-11-20).
+  (170,812 bytes, sha256 `a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab`, re-downloaded from the Google
+  Fonts GitHub on 2026-11-21 after the file was deleted; sha256 verified and the four rendered screenshots are
+  byte-identical to the previous ones, so the output did not change).
 - `app/fonts/Pacifico-Regular.ttf`: https://github.com/google/fonts/raw/main/ofl/pacifico/Pacifico-Regular.ttf
 
 ## Source map
