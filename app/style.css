@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'Anton';
-  src: url('./fonts/Anton-Regular.ttf') format('truetype');
+  font-family: 'Bebas Neue';
+  src: url('./fonts/BebasNeue-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: block;
@@ -25,7 +25,7 @@ body {
 }
 .topbar { display: flex; align-items: baseline; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--line); }
 .topbar h1 {
-  margin: 0; font: 26px/1 Anton, Impact, 'Arial Black', sans-serif; letter-spacing: 1px; text-transform: uppercase;
+  margin: 0; font: 26px/1 'Bebas Neue', Impact, 'Arial Black', sans-serif; letter-spacing: 1px; text-transform: uppercase;
   background: linear-gradient(90deg, var(--orange), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .topbar p { margin: 0; color: var(--dim); }
