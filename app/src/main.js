@@ -15,7 +15,7 @@ const canvas = $('cover');
 const PREVIEW_LONG_SIDE = 1100;
 const POSITIONS = [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']];
 const TITLE_STYLES = [['chrome', 'Chrome (striped)'], ['gradient', 'Gradient']];
-const FONTS = ['100px Anton', '40px Pacifico'];
+const FONTS = ['100px Bebas Neue', '40px Pacifico'];
 
 const panelCount = () => layoutById(state.layoutId).count;
 const previewSize = () => {
